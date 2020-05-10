@@ -8,6 +8,18 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
 Vue.prototype.$axios = axios;
+//添加请求拦截器，在请求头加token
+axios.interceptors.request.use(
+    config => {
+      if (sessionStorage.getItem('token')) {
+        config.headers['token'] = sessionStorage.getItem('token');
+      }
+
+      return config;
+    },
+    error => {
+      return Promise.reject(error);
+    });
 
 Vue.config.productionTip = false
 Vue.use(ElementUI)
