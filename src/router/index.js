@@ -1,7 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 // import HelloWorld from '@/components/HelloWorld'
-import Home from '../pages/Home'
+import StuHome from '../pages/StuHome'
+import TeacHome from '../pages/TeacHome'
 import Login from '../pages/Login'
 import OpenAwards from '../pages/OpenAwards'
 import ApplingAwards from '../pages/ApplyingAwards'
@@ -16,9 +17,43 @@ const router = new Router({
             redirect: '/login'
         },
         {
-            path: '/student/home',
-            name: 'Home',
-            component: Home,
+            path: '/student',
+            name: 'StuHome',
+            component: StuHome,
+            meta: {
+                keepAlive: true
+            },
+            children: [
+                {
+                    path: 'openAwards',
+                    name: 'OpenAwards',
+                    component: OpenAwards,
+                    meta: {
+                        keepAlive: true
+                    }
+                },
+                {
+                    path: 'applyingAwards',
+                    name: 'ApplyingAwards',
+                    component: ApplingAwards,
+                    meta: {
+                        keepAlive: true
+                    }
+                },
+                {
+                    path: 'appliedAwardsHistory',
+                    name: 'AppliedAwardsHistory',
+                    component: ApplingAwards,
+                    meta: {
+                        keepAlive: true
+                    }
+                }
+            ]
+        },
+        {
+            path: '/teacher',
+            name: 'TeacHome',
+            component: TeacHome,
             meta: {
                 keepAlive: true
             }
@@ -31,30 +66,6 @@ const router = new Router({
                 keepAlive: false
             }
         },
-        {
-            path: '/openAwards',
-            name: 'OpenAwards',
-            component: OpenAwards,
-            meta: {
-                keepAlive: true
-            }
-        },
-        {
-            path: '/applyingAwards',
-            name: 'ApplyingAwards',
-            component: ApplingAwards,
-            meta: {
-                keepAlive: true
-            }
-        },
-        {
-            path: '/appliedAwardsHistory',
-            name: 'AppliedAwardsHistory',
-            component: ApplingAwards,
-            meta: {
-                keepAlive: true
-            }
-        }
     ]
 });
 // 导航守卫

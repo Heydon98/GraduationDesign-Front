@@ -19,8 +19,8 @@
                     <span>业务办理</span>
                 </template>
                 <el-menu-item-group>
-                    <el-menu-item index="2-1">健康填报</el-menu-item>
-                    <el-menu-item index="2-2">困难生申请</el-menu-item>
+                    <el-menu-item index="2-1">健康申报</el-menu-item>
+                    <el-menu-item index="2-2">困难生审核</el-menu-item>
                 </el-menu-item-group>
             </el-submenu>
             <el-submenu index="3">
@@ -29,7 +29,7 @@
                     <span>信息查询</span>
                 </template>
                 <el-menu-item-group>
-                    <el-menu-item index="3-1">课表查询</el-menu-item>
+                    <el-menu-item index="3-1">学生信息查询</el-menu-item>
                     <el-menu-item index="3-2">成绩查询</el-menu-item>
                     <el-menu-item index="3-3">图书借阅查询</el-menu-item>
                 </el-menu-item-group>
@@ -40,9 +40,9 @@
                     <span>学风建设</span>
                 </template>
                 <el-menu-item-group>
-                    <el-menu-item index="/student/openAwards">开放申请的奖项</el-menu-item>
-                    <el-menu-item index="/student/applyingAwards">申请中的奖项</el-menu-item>
-                    <el-menu-item index="4-3">申请奖项记录</el-menu-item>
+                    <el-menu-item index="/openAwards">管理奖项</el-menu-item>
+                    <el-menu-item index="/applyingAwards">审批申请</el-menu-item>
+                    <el-menu-item index="4-3">获奖统计</el-menu-item>
                 </el-menu-item-group>
             </el-submenu>
             <el-menu-item index="5">

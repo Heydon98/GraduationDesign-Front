@@ -30,3 +30,10 @@ new Vue({
   components: { App },
   template: '<App/>'
 })
+
+// new Vue({
+//     el: '#app1',
+//     router,
+//     components: {App1},
+//     template: '<App1/>'
+// })

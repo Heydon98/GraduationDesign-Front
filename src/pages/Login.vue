@@ -43,13 +43,13 @@
                             sessionStorage.setItem('collegeId', JSON.stringify(res.data.data.collegeId))
                             sessionStorage.setItem('token', res.data.data.token);
                             sessionStorage.setItem('realName', res.data.data.realName);
-                            this.$router.push('/student/home');
+                            this.$router.push('/student');
                         }
                     }).catch(function (err) {
                         Toast(err);
                     })
                 } else if (this.role == 6) {
-                    this.$axios.post('http://localhost:8080/teacher/login',
+                    this.$axios.post('http://localhost:8088/teacher/login',
                         params
                     ).then((res) => {
                         if(res.data['code'] == 200) {
@@ -59,7 +59,7 @@
                             sessionStorage.setItem('collegeId', JSON.stringify(res.data.data.collegeId))
                             sessionStorage.setItem('token', res.data.data.token);
                             sessionStorage.setItem('realName', res.data.data.realName);
-                            this.$router.push('/teacher/home');
+                            this.$router.push('/teacher');
                         }
                     }).catch(function (err) {
                         Toast(err);
