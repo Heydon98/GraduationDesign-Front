@@ -8,7 +8,7 @@
                 </keep-alive>
             </el-header>
             <el-container>
-                <el-aside>
+                <el-aside style="width: 200px">
                     <!-- 侧边栏 -->
                     <keep-alive>
                         <left></left>
@@ -69,6 +69,9 @@
       width: 15%;
       height: 670px;
     } */
+    .el-container .el-main {
+        background-color: #ECEDF0;
+    }
     .page_part {
         float: right;
         margin: 10px;

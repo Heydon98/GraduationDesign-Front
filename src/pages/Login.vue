@@ -59,6 +59,7 @@
                             sessionStorage.setItem('collegeId', JSON.stringify(res.data.data.collegeId))
                             sessionStorage.setItem('token', res.data.data.token);
                             sessionStorage.setItem('realName', res.data.data.realName);
+                            this.$message.success("欢迎您，" + res.data.data.realName);
                             this.$router.push('/teacher');
                         }
                     }).catch(function (err) {
@@ -90,14 +91,14 @@
     border-radius: 2px;
     margin-top: -5%;
     padding: 2% 2% 4% 2%;
-    border-top: 3px solid #00755e;
+    border-top: 3px solid #409eff;
 }
 .login_input{
     margin: 0 15%;
 }
 .el-button{
     float: right;
-    background: #00755e;
+    background: #409eff;
     color: #fff;
     margin-right: 14%;
 }
@@ -115,6 +116,6 @@ input{
 .noname{
     width: 20px;
     height: 20px;
-    background-color: #00755e;
+    background-color: #409eff;
 }
 </style>

@@ -7,6 +7,9 @@ import Login from '../pages/Login'
 import OpenAwards from '../pages/OpenAwards'
 import ApplingAwards from '../pages/ApplyingAwards'
 import AppliedAwardsHistory from '../pages/ApplyingAwards'
+import ManageAward from "../pages/ManageAward";
+import CheckApply from "../pages/CheackApply";
+import Statistics from "../pages/Statistics";
 
 Vue.use(Router)
 
@@ -56,7 +59,33 @@ const router = new Router({
             component: TeacHome,
             meta: {
                 keepAlive: true
-            }
+            },
+            children: [
+                {
+                    path: 'manageAward',
+                    name: 'ManageAward',
+                    component: ManageAward,
+                    meta: {
+                        keepAlive: true
+                    }
+                },
+                {
+                    path: 'checkApply',
+                    name: 'CheckApply',
+                    component: CheckApply,
+                    meta: {
+                        keepAlive: true
+                    }
+                },
+                {
+                    path: 'statistics',
+                    name: 'Statistics',
+                    component: Statistics,
+                    meta: {
+                        keepAlive: true
+                    }
+                }
+            ]
         },
         {
             path: '/login',

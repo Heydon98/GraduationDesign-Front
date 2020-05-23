@@ -40,9 +40,9 @@
                     <span>学风建设</span>
                 </template>
                 <el-menu-item-group>
-                    <el-menu-item index="/openAwards">管理奖项</el-menu-item>
-                    <el-menu-item index="/applyingAwards">审批申请</el-menu-item>
-                    <el-menu-item index="4-3">获奖统计</el-menu-item>
+                    <el-menu-item index="/teacher/manageAward">管理奖项</el-menu-item>
+                    <el-menu-item index="/teacher/checkApply">审批申请</el-menu-item>
+                    <el-menu-item index="/teacher/statistics">获奖统计</el-menu-item>
                 </el-menu-item-group>
             </el-submenu>
             <el-menu-item index="5">
