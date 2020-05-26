@@ -14,7 +14,7 @@
                                 v-for="bigType in bigTypes"
                                 :key="bigType.value"
                                 :label="bigType.label"
-                                :value="bigType.value">
+                                :value1="bigType.value">
                         </el-option>
                     </el-select>
                 </div>
@@ -27,7 +27,7 @@
                                 v-for="awardName in awardNames"
                                 :key="awardName.value"
                                 :label="awardName.label"
-                                :value="awardName.value">
+                                :value2="awardName.value">
                         </el-option>
                     </el-select>
                 </div>
@@ -77,7 +77,7 @@
                         width="267.9">
                     <template slot-scope="scope">
                         <el-radio v-model="scope.row.checkResult" label="1">通过</el-radio>
-                        <el-radio v-model="scope.row.checkResult" label="2">修改</el-radio>
+<!--                        <el-radio v-model="scope.row.checkResult" label="2">修改</el-radio>-->
                         <el-radio v-model="scope.row.checkResult" label="3">不通过</el-radio>
                     </template>
                 </el-table-column>
@@ -110,6 +110,20 @@
                 isQueried: false,
                 currentPage: 1,
                 pageSize: 10,
+                value1:'',
+                value2: '',
+                bigTypes : [
+                    {
+                        value: '1',
+                        label: '奖学金'
+                    }
+                ],
+                awardNames: [
+                    {
+                        value: '1',
+                        label: '2019-2020国家奖学金'
+                    }
+                ],
                 applies: [
                     {
                         stuId: '2016329600163',

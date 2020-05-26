@@ -5,6 +5,7 @@
                 <span></span>
             </div>
             <el-table
+                    :v-loading="loading"
                     :data="awards.slice((currentPage-1)*pageSize, currentPage*pageSize)"
                     :border=true
                     style="width: 100%">
@@ -40,10 +41,49 @@
                     <template slot-scope="scope">
                         <h1 v-if="scope.row.isApplied == 1">已申请</h1>
                         <!--                    <el-button v-else type="text" @click="applyDialog = true">申请</el-button>-->
-                        <el-button v-else type="text" @click="applyDialog = true, selectedAwardId = scope.row.awardId, selectedAwardName = scope.row.awardName">申请
+                        <el-button v-else type="text"
+                                   @click="applyDialog = true, selectedAwardId = scope.row.awardId, selectedAwardName = scope.row.awardName">
+                            申请
                         </el-button>
                         <!--申请奖项对话框-->
-                        <el-dialog :visible.sync="applyDialog">
+                        <el-dialog
+                                style="text-align: center"
+                                :title="scope.row.awardName"
+                                :visible.sync="applyDialog">
+                            <el-row>
+                                <el-col :span="12">
+                                    学号：
+                                    <el-input
+                                            :disabled="true"
+                                            value="2016329600163">
+                                    </el-input>
+                                </el-col>
+                                <el-col :span="12">
+                                    姓名：
+                                    <el-input
+                                            :disabled="true"
+                                            value="杨海东">
+                                    </el-input>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    学院：
+                                    <el-input
+                                            :disabled="true"
+                                            value="信息学院">
+                                    </el-input>
+                                </el-col>
+                                <el-col :span="12">
+                                    班级：
+                                    <el-input
+                                            :disabled="true"
+                                            value="计算机科学与技术16（3）班"
+                                            >
+                                    </el-input>
+                                </el-col>
+                            </el-row>
+                            <br><br>
                             <el-input
                                     type="textarea"
                                     :rows="10"
@@ -87,10 +127,12 @@
                 selectedAwardName: '',
                 awardsLen: 0,
                 currentPage: 1,
-                pageSize: 10
+                pageSize: 10,
+                loading: true
             }
         },
         mounted() {
+            this.loading = true;
             this.user = sessionStorage.getItem('username');
             this.$axios.get('http://localhost:8088/student/showOpenAwards')
                 .then(res => {
@@ -98,6 +140,7 @@
                         this.awards = res.data.data.awards;
                         console.log(res.data.data.awards.length, 'length')
                         this.awardsLen = res.data.data.awards.length;
+                        //this.loading = false;
                     }
                 });
 
@@ -118,12 +161,12 @@
                         }
                     })
             },
-            success(){
+            success() {
                 this.$message({
                     message: '提交成功',
                     type: 'success'
                 });
-               location.reload();
+                location.reload();
             },
             handleSizeChange(val) {
                 // 每页多少条 和 当前页 切割出数组中响应的部分

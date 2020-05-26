@@ -26,8 +26,8 @@
         },
         methods: {
             handleCommand(command) {
-                if (command === 1){
-
+                if (command === '1'){
+                    this.$router.push('/teacher/personalInfo');
                 }
                 if (command === '2') {
                     sessionStorage.clear();

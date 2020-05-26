@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-// import HelloWorld from '@/components/HelloWorld'
 import StuHome from '../pages/StuHome'
 import TeacHome from '../pages/TeacHome'
 import Login from '../pages/Login'
@@ -10,6 +9,7 @@ import AppliedAwardsHistory from '../pages/ApplyingAwards'
 import ManageAward from "../pages/ManageAward";
 import CheckApply from "../pages/CheackApply";
 import Statistics from "../pages/Statistics";
+import PersonalInfo from "../pages/PersonalInfo";
 
 Vue.use(Router)
 
@@ -81,6 +81,14 @@ const router = new Router({
                     path: 'statistics',
                     name: 'Statistics',
                     component: Statistics,
+                    meta: {
+                        keepAlive: true
+                    }
+                },
+                {
+                    path: 'personalInfo',
+                    name: 'PersonalInfo',
+                    component: PersonalInfo,
                     meta: {
                         keepAlive: true
                     }

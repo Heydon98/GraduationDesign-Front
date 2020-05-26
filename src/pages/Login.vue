@@ -82,7 +82,7 @@
     width: 100%;
     background-color: #ECEDF0;
     padding: 17% 0;
-    /*background-image: url();*/
+    /*background-image: url('../../static/login.png');*/
 }
 .login_form{
     width: 25%;

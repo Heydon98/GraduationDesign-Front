@@ -83,7 +83,7 @@
                             </el-steps>
                             <el-form v-if="active==0" :model="selectedAward" label-width="80px">
                                 <el-form-item label="奖项名称">
-                                    <el-input v-model="selectedAward.awardName"></el-input>
+                                    <el-input v-model="selectedAward.awardName" :disabled="true"></el-input>
                                 </el-form-item>
                                 <!--                            管理授权教师-->
                                 <el-form-item label="授权教师">
@@ -95,15 +95,25 @@
                                             @close="deleteTeac(teacTag)">
                                         {{teacTag}}
                                     </el-tag>
-                                    <el-input
+<!--                                    <el-input-->
+<!--                                            class="input-new-tag"-->
+<!--                                            v-if="inputVisible"-->
+<!--                                            v-model="inputTeacId"-->
+<!--                                            ref="saveTagInput"-->
+<!--                                            size="small"-->
+<!--                                            @keyup.enter.native="handleInputConfirm"-->
+<!--                                            @blur="handleInputConfirm">-->
+<!--                                    </el-input>-->
+                                    <el-autocomplete
                                             class="input-new-tag"
-                                            v-if="inputVisable"
+                                            v-if="inputVisible"
                                             v-model="inputTeacId"
                                             ref="saveTagInput"
-                                            size="small"
-                                            @keyup.enter.native="handleInputConfirm"
-                                            @blur="handleInputConfirm">
-                                    </el-input>
+                                            size="large"
+                                            :fetch-suggestions="querySearchAsync"
+                                            placeholder="请输入内容"
+                                            @select="handleSelect"
+                                    ></el-autocomplete>
                                     <el-button v-else class="button-new-tag" size="small" @click="showInput">+ 添加新教师
                                     </el-button>
                                 </el-form-item>
@@ -118,7 +128,8 @@
                                 title="注意！"
                                 :visible.sync="deleteDialog">
                         <span>
-                            确认删除{{selectedAward.awardName}}?
+                            确认删除 {{selectedAward.awardName}} ?
+                            如确认删除该选项，请在输入框内输入 立即删除 四个字。<el-input></el-input>
                         </span>
                             <span slot="footer" class="dialog-footer">
                             <el-button @click="deleteDialog = false">取 消</el-button>
@@ -129,6 +140,7 @@
                 </el-table-column>
             </el-table>
 
+            <!--            分页-->
             <el-pagination
                     class="page_part"
                     @size-change="handleSizeChange"
@@ -150,7 +162,9 @@
         name: "ManageAward",
         data() {
             return {
+                // 奖项数据
                 awards: [],
+                // 当前行奖项
                 selectedAward: {
                     awardId: '',
                     awardName: '',
@@ -161,10 +175,12 @@
                     startTime: '',
                     stateId: ''
                 },
+                //管理对话
                 manageDialog: false,
-                formLabelWidth: '120px',
+                //formLabelWidth: '120px',
                 applyReason: '',
                 active: 0,
+                //新建删除奖项对话
                 newDialog: false,
                 deleteDialog: false,
                 newFrom: {
@@ -174,11 +190,17 @@
                     limitNum: '',
                     introduce: ''
                 },
+                //分页
                 currentPage: 1,
                 pageSize: 10,
+                //教师tag
                 teacTags: ['吴云枭', '边境'],
                 inputVisible: false,
                 inputValue: '',
+                inputTeacId: '',
+                teachers: [],
+                timeout:  null,
+                //奖项类型
                 types: [
                     {
                         value: '1',
@@ -226,14 +248,18 @@
 
         },
         methods: {
+
             next() {
                 this.active++;
             },
+
             last() {
                 this.active--;
             },
+
             manage() {
                 this.manageDialog = true;
+                this.teachers = this.loadAll();
                 // this.active = this.selectedAward.stateId;
                 if (this.selectedAward.awardState == '准备')
                     this.active = 0;
@@ -242,6 +268,7 @@
                 if (this.selectedAward.awardState == '审核')
                     this.active = 2;
             },
+
             newAward() {
                 let params = new URLSearchParams();
                 params.append('awardName', this.newFrom.awardName);
@@ -257,10 +284,12 @@
                         }
                     })
             },
+
             handleChange(value) {
                 this.newFrom.bigType = value[0];
                 this.newFrom.smallType = value[1];
             },
+
             changeState() {
                 let params = new URLSearchParams();
                 params.append("stateId", this.active + 1);
@@ -273,6 +302,7 @@
                         }
                     })
             },
+
             deleteAward() {
                 let params = new URLSearchParams();
                 params.append("awardId", this.selectedAward.awardId);
@@ -284,6 +314,7 @@
                         }
                     })
             },
+
             success() {
                 this.$message({
                     message: '提交成功',
@@ -291,18 +322,96 @@
                 });
                 location.reload();
             },
+
             handleSizeChange(val) {
                 // 每页多少条 和 当前页 切割出数组中响应的部分
                 this.pageSize = val;
                 console.log(`每页 ${val} 条`);
 
             },
+
             handleCurrentChange(val) {
                 this.currentPage = val;
                 console.log(this.pageSize, 'page');
                 console.log(`当前页: ${val}`);
 
+            },
+
+            deleteTeac(teacTag) {
+                this.teacTags.splice(this.teacTags.indexOf(teacTag), 1);
+            },
+
+            showInput() {
+                this.inputVisible = true;
+                this.$nextTick(_ => {
+                    this.$refs.saveTagInput.$refs.input.focus();
+                });
+            },
+
+            // handleInputConfirm() {
+            //     let inputValue = this.inputValue;
+            //     if (inputValue) {
+            //         this.teacTags.push(inputValue);
+            //     }
+            //     this.inputVisible = false;
+            //     this.inputValue = '';
+            // },
+
+            loadAll() {
+                let params = new URLSearchParams();
+                params.append('awardId', this.selectedAward.awardId);
+                this.$axios.post('http://localhost:8088/teacher/checkTeacher', params)
+                    .then((res) => {
+                        if (res.data['code'] == 200) {
+                            let list = [{}];
+                            // let data = res.data.data['checkTeacs'];
+                            // for (var i=0; i<data.length; i++) {
+                            //     data[i].value = res.data.data.checkTeacs[i];
+                            // }
+                            // console.log(data);
+                            // return data;
+                            // for (let i = res.data.data['checkTeacs']) {
+                            //     // i.value =
+                            // }
+                            list.push({key: 'value', value: '吴云霄'});
+                            //cb(list);
+                            console.log(list);
+                            return list;
+                            // console.log(res.data.data.checkTeacs);
+                            // return res.data.data.checkTeacs;
+                        }
+                    })
+                // return [
+                //     { "value": "三全鲜食（北新泾店）", "address": "长宁区新渔路144号" },
+                //     { "value": "Hot honey 首尔炸鸡（仙霞路）", "address": "上海市长宁区淞虹路661号" }
+                // ]
+                // console.log(res.data.data['checkTeacs']);
+            },
+
+            querySearchAsync(queryString, cb) {
+                var teachers = this.teachers;
+                var results = queryString ? teachers.filter(this.createStateFilter(queryString)) : teachers;
+
+                clearTimeout(this.timeout);
+                this.timeout = setTimeout(() => {
+                    cb(results);
+                }, 3000 * Math.random());
+            },
+            createStateFilter(queryString) {
+                return (inputTeacId) => {
+                    return (inputTeacId.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+                };
+            },
+            handleSelect(item) {
+                console.log(item);
+                let inputTeacId = this.inputValue;
+                if (item) {
+                    this.teacTags.push(item['value']);
+                }
+                this.inputVisible = false;
+                this.inputValue = '';
             }
+
         }
     }
 </script>
@@ -321,7 +430,7 @@
     }
 
     .input-new-tag {
-        width: 90px;
+        width: 200px;
         margin-left: 10px;
         vertical-align: bottom;
     }

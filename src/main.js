@@ -6,8 +6,10 @@ import router from './router'
 import axios from 'axios';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import echarts from 'echarts';
 
 Vue.prototype.$axios = axios;
+Vue.prototype.$echarts = echarts
 //添加请求拦截器，在请求头加token
 axios.interceptors.request.use(
     config => {
