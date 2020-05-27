@@ -50,6 +50,14 @@ const router = new Router({
                     meta: {
                         keepAlive: true
                     }
+                },
+                {
+                    path: 'personalInfo',
+                    name: 'PersonalInfo',
+                    component: PersonalInfo,
+                    meta: {
+                        keepAlive: true
+                    }
                 }
             ]
         },
@@ -81,14 +89,6 @@ const router = new Router({
                     path: 'statistics',
                     name: 'Statistics',
                     component: Statistics,
-                    meta: {
-                        keepAlive: true
-                    }
-                },
-                {
-                    path: 'personalInfo',
-                    name: 'PersonalInfo',
-                    component: PersonalInfo,
                     meta: {
                         keepAlive: true
                     }

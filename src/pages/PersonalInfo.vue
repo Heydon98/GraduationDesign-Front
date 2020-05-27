@@ -11,14 +11,14 @@
                             学号：
                             <el-input
                                     :disabled="true"
-                                    value="2016329600163">
+                                    v-model="this.info.stuId">
                             </el-input>
                         </el-col>
                         <el-col :span="12">
                             姓名：
                             <el-input
                                     :disabled="true"
-                                    value="杨海东">
+                                    v-model="this.info.stuName">
                             </el-input>
                         </el-col>
                     </el-row>
@@ -29,14 +29,14 @@
                             学院：
                             <el-input
                                     :disabled="true"
-                                    value="2016329600163">
+                                    v-model="this.info.college">
                             </el-input>
                         </el-col>
                         <el-col :span="12">
                             系别：
                             <el-input
                                     :disabled="true"
-                                    value="杨海东">
+                                    v-model="this.info.major">
                             </el-input>
                         </el-col>
                     </el-row>
@@ -47,14 +47,14 @@
                             年级：
                             <el-input
                                     :disabled="true"
-                                    value="2016329600163">
+                                    v-model="this.info.classYear">
                             </el-input>
                         </el-col>
                         <el-col :span="12">
                             班级：
                             <el-input
                                     :disabled="true"
-                                    value="杨海东">
+                                    v-model="this.info.clazz">
                             </el-input>
                         </el-col>
                     </el-row>
@@ -64,15 +64,13 @@
                         <el-col :span="12">
                             微信：
                             <el-input
-                                    :disabled="true"
-                                    value="2016329600163">
+                                    v-model="this.info.wechat">
                             </el-input>
                         </el-col>
                         <el-col :span="12">
                             QQ：
                             <el-input
-                                    :disabled="true"
-                                    value="杨海东">
+                                    v-model="this.info.qq">
                             </el-input>
                         </el-col>
                     </el-row>
@@ -80,29 +78,16 @@
                 <el-form-item
                     label="电话号码：">
                     <el-input
-                            :disabled="true"
-                            value="杨海东">
+                            v-model="this.info.tel">
                     </el-input>
                 </el-form-item>
                 <el-form-item
                         label="电子邮件：">
                     <el-input
-                            :disabled="true"
-                            value="杨海东">
+                            v-model="this.info.email">
                     </el-input>
                 </el-form-item>
-                <el-form-item
-                    label="更新密码：">
-                    <el-input placeholder="请输入新密码" v-model="input" show-password></el-input>
-                </el-form-item>
-                <el-form-item
-                        label="确认密码：">
-                    <el-input placeholder="请再次输入新密码" v-model="input" show-password></el-input>
-                </el-form-item>
-                <div slot="footer" class="dialog-footer">
-                    <el-button >取 消</el-button>
-                    <el-button :plain="true" >确定</el-button>
-                </div>
+                <el-button type="primary" @click="handleCommit">确认修改</el-button>
 
             </el-form>
         </el-tabs>
@@ -114,11 +99,35 @@
         name: "PersonalInfo",
         data() {
             return{
-                info: {
-                    stuId: '',
-                    stuName: '',
-                    input: ''
-                }
+                info: ''
+            }
+        },
+        mounted() {
+            this.$axios.get('http://localhost:8088/student/personalInfo')
+                .then((res) => {
+                    this.info = res.data.data.personalInfo;
+                })
+        },
+        methods: {
+            handleCommit(){
+                let params = new URLSearchParams();
+                params.append('wechat', this.info.wechat);
+                params.append('qq', this.info.qq);
+                params.append('tel', this.info.tel);
+                params.append('email', this.info.email);
+                this.$axios.post('http://localhost:8088/student/changeInfo', params)
+                    .then((res) => {
+                        if (res.data['code'] == 200) {
+                            this.success();
+                        }
+                    });
+            },
+            success() {
+                this.$message({
+                    message: '提交成功',
+                    type: 'success'
+                });
+                location.reload();
             }
         }
     }
@@ -127,10 +136,13 @@
 <style scoped>
 
     .el-input {
-        width: 200px;
+        width: 230px;
     }
     .el-tabs {
         width: 600px;
+    }
+    .el-button{
+        text-align: center;
     }
 
 </style>

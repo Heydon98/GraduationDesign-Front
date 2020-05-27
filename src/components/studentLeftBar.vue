@@ -49,7 +49,7 @@
                 <i class="el-icon-menu"></i>
                 <span slot="title">寝室建设</span>
             </el-menu-item>
-            <el-menu-item index="6">
+            <el-menu-item index="/student/personalInfo">
                 <i class="el-icon-menu"></i>
                 <span slot="title">账号信息</span>
             </el-menu-item>

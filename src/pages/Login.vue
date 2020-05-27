@@ -43,6 +43,7 @@
                             sessionStorage.setItem('collegeId', JSON.stringify(res.data.data.collegeId))
                             sessionStorage.setItem('token', res.data.data.token);
                             sessionStorage.setItem('realName', res.data.data.realName);
+                            this.$message.success("欢迎您，" + res.data.data.realName);
                             this.$router.push('/student');
                         }
                     }).catch(function (err) {
