@@ -8,38 +8,54 @@
                 <div class="typeSelect">
                     奖项类别：
                     <el-select
-                            v-model="bigType"
+                            v-model="value"
+                            @change="selectType"
                             placeholder="请选择">
                         <el-option
-                                v-for="bigType in bigTypes"
-                                :key="bigType.value"
-                                :label="bigType.label"
-                                :value1="bigType.value">
+                                v-for="item in bigTypes"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
                         </el-option>
                     </el-select>
                 </div>
                 <div class="nameSelect">
                     奖项名称：
-                    <el-select
-                            v-model="awardName"
-                            placeholder="请选择">
+                    <el-select v-model="value1" placeholder="请选择">
                         <el-option
-                                v-for="awardName in awardNames"
-                                :key="awardName.value"
-                                :label="awardName.label"
-                                :value2="awardName.value">
+                                v-for="item in awardNames"
+                                :key="item.awardId"
+                                :label="item.awardName"
+                                :value="item.awardId">
                         </el-option>
                     </el-select>
+
+                </div>
+                <div class="checkSelect">
+                    是否审核：
+                    <el-select
+                            style="width: 100px"
+                            v-model="value2"
+                            placeholder="请选择">
+                        <el-option
+                                v-for="item in isChecked"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+
                 </div>
                 <div class="queryButton">
                     <el-button type="primary" @click="query">查询</el-button>
                 </div>
                 <div class="commitButton">
-                    <el-button type="primary" icon="el-icon-check" round @click="commitButton">提交</el-button>
+                    <el-button type="primary" icon="el-icon-check" round @click="commitCheck">提交</el-button>
                 </div>
             </div>
 
             <el-table
+                    v-if="isQueried"
                     class="checkTable"
                     :data="applies.slice((currentPage-1)*pageSize, currentPage*pageSize)"
                     :border=true
@@ -50,7 +66,7 @@
                         width="130">
                 </el-table-column>
                 <el-table-column
-                        prop="name"
+                        prop="stuName"
                         label="姓名"
                         width="150">
                 </el-table-column>
@@ -60,7 +76,7 @@
                         width="150">
                 </el-table-column>
                 <el-table-column
-                        prop="class"
+                        prop="clazz"
                         label="班级"
                         width="200">
                 </el-table-column>
@@ -72,13 +88,11 @@
 
                 </el-table-column>
                 <el-table-column
-                        prop="check"
                         label="审核"
                         width="267.9">
                     <template slot-scope="scope">
-                        <el-radio v-model="scope.row.checkResult" label="1">通过</el-radio>
-<!--                        <el-radio v-model="scope.row.checkResult" label="2">修改</el-radio>-->
-                        <el-radio v-model="scope.row.checkResult" label="3">不通过</el-radio>
+                        <el-radio v-model="scope.row.checkResult" label="1" @change="scope.row.isAltered = 1">通过</el-radio>
+                        <el-radio v-model="scope.row.checkResult" label="2" @change="scope.row.isAltered = 1">不通过</el-radio>
                     </template>
                 </el-table-column>
             </el-table>
@@ -88,11 +102,11 @@
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
                     :current-page="currentPage"
-                    :page-sizes="[10, 20, 30, 40]"
+                    :page-sizes="[10, 20, 50, 100]"
                     :page-size="pageSize"
                     layout="total, sizes, prev, pager, next, jumper"
                     style="text-align: center"
-                    :total="4">
+                    :total="appliesLen">
             </el-pagination>
         </el-tabs>
 
@@ -110,51 +124,47 @@
                 isQueried: false,
                 currentPage: 1,
                 pageSize: 10,
-                value1:'',
+                appliesLen: '',
+                selectApply: '',
+                value: '',
+                value1: '',
                 value2: '',
                 bigTypes : [
                     {
                         value: '1',
                         label: '奖学金'
+                    },
+                    {
+                        value: '2',
+                        label: '荣誉称号'
                     }
                 ],
-                awardNames: [
+                awardNames: [],
+                isChecked: [
+                    {
+                        value: '0',
+                        label: '未审核'
+                    },
                     {
                         value: '1',
-                        label: '2019-2020国家奖学金'
+                        label: '已审核'
                     }
                 ],
-                applies: [
-                    {
-                        stuId: '2016329600163',
-                        name: '杨海东',
-                        college: '信息学院',
-                        class: '计算机科学与技术16（3）班',
-                        reason: '测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试',
-                        checkResult: ''
-                    },
-                    {
-                        stuId: '2016329600164',
-                        name: '杨海东',
-                        college: '信息学院',
-                        class: '计算机科学与技术16（3）班',
-                        reason: '测试测试测试测试测试测试测试测试',
-                        checkResult: ''
-                    },
-                    {
-                        stuId: '2016329600164',
-                        name: '杨海东',
-                        college: '信息学院',
-                        class: '计算机科学与技术16（3）班',
-                        reason: '测试测试测试测试测试测试测试测试',
-                        checkResult: ''
-                    }
-                ]
+                applies: []
             }
         },
         methods:{
             query() {
                 this.isQueried = true;
+                let params = new URLSearchParams();
+                params.append("awardId", this.value1);
+                params.append("isChecked", this.value2);
+                this.$axios.post('http://localhost:8088/teacher/queryApplies', params)
+                    .then((res) => {
+                        this.applies = res.data.data.applies;
+                        this.appliesLen = this.applies.length;
+                    })
+
             },
             handleSizeChange(val) {
                 // 每页多少条 和 当前页 切割出数组中响应的部分
@@ -167,6 +177,36 @@
                 console.log(this.pageSize, 'page');
                 console.log(`当前页: ${val}`);
 
+            },
+            selectType(){
+                let params = new URLSearchParams();
+                params.append('bigTypeId', this.value);
+                this.$axios.post('http://localhost:8088/teacher/myCheckAward', params)
+                    .then((res) => {
+                        this.awardNames =  res.data.data.awards;
+                    });
+                this.value1 = '';
+            },
+            commitCheck(){
+                let params = new URLSearchParams();
+                for (let i=0; i<this.applies.length; i++){
+                    if (this.applies[i].isAltered == 1){
+                        params.append(this.applies[i].stuAwardId, this.applies[i].checkResult);
+                    }
+                }
+                this.$axios.post('http://localhost:8088/teacher/checkApply', params)
+                    .then((res) => {
+                        if (res.data['code'] == 200) {
+                            this.success();
+                        }
+                    })
+            },
+            success() {
+                this.$message({
+                    message: '提交成功',
+                    type: 'success'
+                });
+                location.reload();
             }
         }
     }
@@ -185,6 +225,10 @@
         float: left;
         padding-left: 10px;
     }
+    .checkSelect {
+        float: left;
+        padding-left: 10px;
+    }
     . border-card {
         height: 10px;
     }
@@ -193,7 +237,7 @@
     }
     .commitButton {
         float: left;
-        padding-left: 400px;
+        padding-left: 200px;
     }
 
 </style>

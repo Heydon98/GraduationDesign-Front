@@ -98,7 +98,6 @@
                                     <el-select
                                             v-if="inputVisible"
                                             v-model="value"
-                                            multiple
                                             filterable
                                             remote
                                             @change="addCheckTeac"

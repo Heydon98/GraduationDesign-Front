@@ -8,26 +8,25 @@
                 <div class="typeSelect">
                     奖项类别：
                     <el-select
-                            v-model="bigType"
+                            v-model="value"
+                            @change="selectType"
                             placeholder="请选择">
                         <el-option
-                                v-for="bigType in bigTypes"
-                                :key="bigType.value"
-                                :label="bigType.label"
-                                :value1="bigType.value">
+                                v-for="item in bigTypes"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
                         </el-option>
                     </el-select>
                 </div>
                 <div class="nameSelect">
                     奖项名称：
-                    <el-select
-                            v-model="awardName"
-                            placeholder="请选择">
+                    <el-select v-model="value1" placeholder="请选择">
                         <el-option
-                                v-for="awardName in awardNames"
-                                :key="awardName.value"
-                                :label="awardName.label"
-                                :value2="awardName.value">
+                                v-for="item in awardNames"
+                                :key="item.awardId"
+                                :label="item.awardName"
+                                :value="item.awardId">
                         </el-option>
                     </el-select>
                 </div>
@@ -43,7 +42,7 @@
                 <el-col :span="12">
                     <el-table
                         v-if="isQueried == true"
-                        :data="students"
+                        :data="students.slice((currentPage-1)*pageSize, currentPage*pageSize)"
                         :border="true"
                         style="width: 623px">
                         <el-table-column
@@ -52,7 +51,7 @@
                                 width="130">
                         </el-table-column>
                         <el-table-column
-                                prop="name"
+                                prop="stuName"
                                 label="姓名"
                                 width="142.5">
                         </el-table-column>
@@ -62,7 +61,7 @@
                                 width="150">
                         </el-table-column>
                         <el-table-column
-                                prop="class"
+                                prop="clazz"
                                 label="班级"
                                 width="200">
                         </el-table-column>
@@ -73,11 +72,11 @@
                             @size-change="handleSizeChange"
                             @current-change="handleCurrentChange"
                             :current-page="currentPage"
-                            :page-sizes="[10, 20, 30, 40]"
+                            :page-sizes="[10, 20, 50, 100]"
                             :page-size="pageSize"
                             layout="total, sizes, prev, pager, next, jumper"
                             style="text-align: center"
-                            :total="9">
+                            :total="stuLen">
                     </el-pagination>
                 </el-col>
             </el-row>
@@ -97,79 +96,31 @@
         name: "Statistics",
         data() {
             return {
-                students: [
-                    {
-                        stuId: '2016329600163',
-                        name: '杨海东',
-                        college: '信息学院',
-                        class: '计算机科学与技术16（1）班'
-                    },
-                    {
-                        stuId: '2016329600164',
-                        name: '杨海东',
-                        college: '信息学院',
-                        class: '计算机科学与技术16（1）班'
-                    },
-                    {
-                        stuId: '2016329600165',
-                        name: '杨海东',
-                        college: '信息学院',
-                        class: '计算机科学与技术16（2）班'
-                    },
-                    {
-                        stuId: '2016329600166',
-                        name: '杨海东',
-                        college: '信息学院',
-                        class: '计算机科学与技术16（2）班'
-                    },
-                    {
-                        stuId: '2016329600167',
-                        name: '杨海东',
-                        college: '信息学院',
-                        class: '计算机科学与技术16（3）班'
-                    },
-                    {
-                        stuId: '2016329600168',
-                        name: '杨海东',
-                        college: '信息学院',
-                        class: '计算机科学与技术16（4）班'
-                    },
-                    {
-                        stuId: '2016329600169',
-                        name: '杨海东',
-                        college: '信息学院',
-                        class: '计算机科学与技术16（5）班'
-                    },
-                    {
-                        stuId: '2016329600170',
-                        name: '杨海东',
-                        college: '信息学院',
-                        class: '计算机科学与技术16（5）班'
-                    },
-                    {
-                        stuId: '2016329600161',
-                        name: '杨海东',
-                        college: '信息学院',
-                        class: '计算机科学与技术16（5）班'
-                    }
-                ],
+                students: [],
                 currentPage: 1,
                 pageSize: 10,
                 isQueried: false,
-                value1:'',
-                value2: '',
+                value: '',
+                value1: '',
                 bigTypes : [
                     {
                         value: '1',
                         label: '奖学金'
-                    }
-                ],
-                awardNames: [
+                    },
                     {
-                        value: '1',
-                        label: '2019-2020国家奖学金'
+                        value: '2',
+                        label: '荣誉称号'
                     }
                 ],
+                awardNames: [],
+                stuLen: '',
+                //图数据
+                title : {
+                    text: '',//主标题
+                    //subtext: '纯属虚构',//副标题
+                    x:'center',//x轴方向对齐方式
+                },
+                data:[]
             }
         },
         mounted() {
@@ -182,15 +133,11 @@
                 // 绘制图表
                 myChart.setOption({
                     // 标题组件，包含主标题和副标题
-                    title : {
-                        text: '某站点用户访问来源',//主标题
-                        subtext: '纯属虚构',//副标题
-                        x:'center',//x轴方向对齐方式
-                    },
+                    title : this.title,
                     // 提示框组件
                     tooltip : {
                         trigger: 'item',
-                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        formatter: "{a} <br/>{b} : {c} 人({d}%)"
                     },
                     // 图
                     series : [
@@ -200,13 +147,7 @@
                             radius : '80%',
                             center: ['50%', '60%'],
                             roseType: 'angle',
-                            data:[
-                                {value:2, name:'计算机科学与技术16（1）班'},
-                                {value:2, name:'计算机科学与技术16（2）班'},
-                                {value:1, name:'计算机科学与技术16（3）班'},
-                                {value:1, name:'计算机科学与技术16（4）班'},
-                                {value:3, name:'计算机科学与技术16（5）班'}
-                            ],
+                            data:this.data,
                             itemStyle: {
                                 emphasis: {
                                     shadowBlur: 10,
@@ -221,6 +162,21 @@
             },
             query() {
                 this.isQueried = true;
+                let params = new URLSearchParams();
+                params.append("awardId", this.value1);
+                this.$axios.post('http://localhost:8088/teacher/winStudents', params)
+                    .then((res) => {
+                        this.students = res.data.data.students;
+                        this.stuLen = this.students.length;
+                    })
+                this.$axios.post('http://localhost:8088/teacher/awardName', params)
+                    .then((res) => {
+                        this.title.text = res.data.data.awardName + '统计图';
+                    })
+                this.$axios.post('http://localhost:8088/teacher/statistics', params)
+                    .then((res) => {
+                        this.data = res.data.data.statistics;
+                    })
                 this.initEchart();
             },
             handleSizeChange(val) {
@@ -234,6 +190,15 @@
                 console.log(this.pageSize, 'page');
                 console.log(`当前页: ${val}`);
 
+            },
+            selectType(){
+                let params = new URLSearchParams();
+                params.append('bigTypeId', this.value);
+                this.$axios.post('http://localhost:8088/teacher/myCheckAward', params)
+                    .then((res) => {
+                        this.awardNames =  res.data.data.awards;
+                    });
+                this.value1 = '';
             }
         },
     }
