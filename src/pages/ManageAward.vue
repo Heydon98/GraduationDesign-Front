@@ -88,32 +88,31 @@
                                 <!--                            管理授权教师-->
                                 <el-form-item label="授权教师">
                                     <el-tag
-                                            :key="teacTag"
-                                            v-for="teacTag in teacTags"
-                                            closable="true"
+                                            :key="checkTeac"
+                                            v-for="checkTeac in checkTeacs"
+                                            closable
                                             :disable-transitions="false"
-                                            @close="deleteTeac(teacTag)">
-                                        {{teacTag}}
+                                            @close="deleteTeac(checkTeac)">
+                                        {{checkTeac.nameId}}
                                     </el-tag>
-<!--                                    <el-input-->
-<!--                                            class="input-new-tag"-->
-<!--                                            v-if="inputVisible"-->
-<!--                                            v-model="inputTeacId"-->
-<!--                                            ref="saveTagInput"-->
-<!--                                            size="small"-->
-<!--                                            @keyup.enter.native="handleInputConfirm"-->
-<!--                                            @blur="handleInputConfirm">-->
-<!--                                    </el-input>-->
-                                    <el-autocomplete
-                                            class="input-new-tag"
+                                    <el-select
                                             v-if="inputVisible"
-                                            v-model="inputTeacId"
-                                            ref="saveTagInput"
-                                            size="large"
-                                            :fetch-suggestions="querySearchAsync"
-                                            placeholder="请输入内容"
-                                            @select="handleSelect"
-                                    ></el-autocomplete>
+                                            v-model="value"
+                                            multiple
+                                            filterable
+                                            remote
+                                            @change="addCheckTeac"
+                                            reserve-keyword
+                                            placeholder="请输入关键词"
+                                            :remote-method="remoteMethod"
+                                            :loading="loading">
+                                        <el-option
+                                                v-for="item in options"
+                                                :key="item.value"
+                                                :label="item.label"
+                                                :value="item.value">
+                                        </el-option>
+                                    </el-select>
                                     <el-button v-else class="button-new-tag" size="small" @click="showInput">+ 添加新教师
                                     </el-button>
                                 </el-form-item>
@@ -194,12 +193,14 @@
                 currentPage: 1,
                 pageSize: 10,
                 //教师tag
-                teacTags: ['吴云枭', '边境'],
+                checkTeacs: [],
+                //远程搜索
                 inputVisible: false,
-                inputValue: '',
-                inputTeacId: '',
-                teachers: [],
-                timeout:  null,
+                options: [],
+                list: [],
+                value: '',
+                loading: false,
+                allTeacs: [],
                 //奖项类型
                 types: [
                     {
@@ -245,7 +246,6 @@
                         this.awardsLen = res.data.data.awards.length;
                     }
                 });
-
         },
         methods: {
 
@@ -259,7 +259,6 @@
 
             manage() {
                 this.manageDialog = true;
-                this.teachers = this.loadAll();
                 // this.active = this.selectedAward.stateId;
                 if (this.selectedAward.awardState == '准备')
                     this.active = 0;
@@ -267,6 +266,54 @@
                     this.active = 1;
                 if (this.selectedAward.awardState == '审核')
                     this.active = 2;
+                let params = new URLSearchParams();
+                params.append('awardId', this.selectedAward.awardId);
+                this.$axios.post('http://localhost:8088/teacher/checkTeacs', params)
+                    .then((res) => {
+                        if (res.data['code'] == 200) {
+                            this.checkTeacs = res.data.data.checkTeacs;
+                        }
+                    });
+                this.$axios.get('http://localhost:8088/teacher/getAllTeacs')
+                    .then((res) => {
+                        if (res.data['code'] == 200){
+                            this.allTeacs = res.data.data.allTeacs;
+                            this.list = this.allTeacs.map(item => {
+                                console.log(item.teacId);
+                                return { value: item.teacId, label: item.nameId };
+                            });
+                        }
+                    });
+
+            },
+            remoteMethod(query) {
+                if (query !== '') {
+                    this.loading = true;
+                    setTimeout(() => {
+                        this.loading = false;
+                        this.options = this.list.filter(item => {
+                            return item.label.toLowerCase()
+                                .indexOf(query.toLowerCase()) > -1;
+                        });
+                    }, 200);
+                } else {
+                    this.options = [];
+                }
+            },
+            addCheckTeac(){
+                let params = new URLSearchParams();
+                params.append('teacId', this.value);
+                params.append('awardId', this.selectedAward.awardId);
+                this.$axios.post('http://localhost:8088/teacher/addCheckTeac', params)
+                    .then((res) => {
+                        if (res.data['code'] == 200){
+                            var teac = {teacId: res.data.data.teacId, nameId: res.data.data.nameId};
+                            this.checkTeacs.push(teac);
+                            console.log(this.checkTeacs);
+                            this.inputVisible = false;
+                            this.value = '';
+                        }
+                    });
             },
 
             newAward() {
@@ -284,6 +331,7 @@
                         }
                     })
             },
+
 
             handleChange(value) {
                 this.newFrom.bigType = value[0];
@@ -337,81 +385,23 @@
 
             },
 
-            deleteTeac(teacTag) {
-                this.teacTags.splice(this.teacTags.indexOf(teacTag), 1);
+            deleteTeac(checkTeac) {
+
+                let params = new URLSearchParams();
+                params.append('teacId', checkTeac.teacId);
+                params.append('awardId', this.selectedAward.awardId);
+                this.$axios.post('http://localhost:8088/teacher/deleteCheckTeac',params)
+                    .then((res) => {
+                        if (res.data['code'] == 200) {
+                            this.checkTeacs.splice(this.checkTeacs.indexOf(checkTeac), 1);
+                        }
+                    })
             },
 
             showInput() {
                 this.inputVisible = true;
-                this.$nextTick(_ => {
-                    this.$refs.saveTagInput.$refs.input.focus();
-                });
+
             },
-
-            // handleInputConfirm() {
-            //     let inputValue = this.inputValue;
-            //     if (inputValue) {
-            //         this.teacTags.push(inputValue);
-            //     }
-            //     this.inputVisible = false;
-            //     this.inputValue = '';
-            // },
-
-            loadAll() {
-                let params = new URLSearchParams();
-                params.append('awardId', this.selectedAward.awardId);
-                this.$axios.post('http://localhost:8088/teacher/checkTeacher', params)
-                    .then((res) => {
-                        if (res.data['code'] == 200) {
-                            let list = [{}];
-                            // let data = res.data.data['checkTeacs'];
-                            // for (var i=0; i<data.length; i++) {
-                            //     data[i].value = res.data.data.checkTeacs[i];
-                            // }
-                            // console.log(data);
-                            // return data;
-                            // for (let i = res.data.data['checkTeacs']) {
-                            //     // i.value =
-                            // }
-                            list.push({key: 'value', value: '吴云霄'});
-                            //cb(list);
-                            console.log(list);
-                            return list;
-                            // console.log(res.data.data.checkTeacs);
-                            // return res.data.data.checkTeacs;
-                        }
-                    })
-                // return [
-                //     { "value": "三全鲜食（北新泾店）", "address": "长宁区新渔路144号" },
-                //     { "value": "Hot honey 首尔炸鸡（仙霞路）", "address": "上海市长宁区淞虹路661号" }
-                // ]
-                // console.log(res.data.data['checkTeacs']);
-            },
-
-            querySearchAsync(queryString, cb) {
-                var teachers = this.teachers;
-                var results = queryString ? teachers.filter(this.createStateFilter(queryString)) : teachers;
-
-                clearTimeout(this.timeout);
-                this.timeout = setTimeout(() => {
-                    cb(results);
-                }, 3000 * Math.random());
-            },
-            createStateFilter(queryString) {
-                return (inputTeacId) => {
-                    return (inputTeacId.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-                };
-            },
-            handleSelect(item) {
-                console.log(item);
-                let inputTeacId = this.inputValue;
-                if (item) {
-                    this.teacTags.push(item['value']);
-                }
-                this.inputVisible = false;
-                this.inputValue = '';
-            }
-
         }
     }
 </script>
